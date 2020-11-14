@@ -8,7 +8,7 @@ class Mapper:
         self.lines = []
         self.filename = None
         self.regex = {
-            'method': '[a-zA-Z0-9_]*\([a-zA-Z0-9 ,]*\);',
+            'method': '[a-zA-Z0-9_]*\([a-zA-Z0-9 ,.]*\);',
             'source': '(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
             'target': '(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?'
         }
@@ -23,8 +23,7 @@ class Mapper:
         mappings = []
         for line in self.lines:
             if re.search(self.regex['method'], line):
-                method = re.search(self.regex['method'], line).group(0).replace(' ', '_'
-                )
+                method = re.search(self.regex['method'], line).group(0).replace(' ', '_')
                 self.mappings[method] = mappings
                 mappings = []
             elif line.__contains__('@Mapping('):
