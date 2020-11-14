@@ -11,6 +11,7 @@ Parses a Java MapStruct interface file and generates CSV that can be pasted on c
 Run `mapper.py` using python3:
 ```
 python3 mapper.py -f <path_to_file> -s <source_column_heading> -t <target_column_heading> [-r] [-d]
+```
 
 Example:
 ```
