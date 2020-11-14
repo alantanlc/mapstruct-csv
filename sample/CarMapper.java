@@ -6,5 +6,7 @@ public interface CarMapper {
     @Mapping(source = "numberOfSeats", target = "seatCount")
     CarDto carToCarDto(Car car);
 
-}
+    @Mapping(source = "seatCount", target = "numberOfSeats")
+    Car carDtoToCar(CarDto carDto);
 
+}
