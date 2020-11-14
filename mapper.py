@@ -28,9 +28,12 @@ class Mapper:
                 self.mappings[method] = mappings
                 mappings = []
             elif line.__contains__('@Mapping('):
-                source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
                 target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
-                mappings.append((source, target))
+                source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
+                if args.reverse:
+                    mappings.append((target, source))
+                else:
+                    mappings.append((source, target))
         return self
 
     def get_filename(self, method):
@@ -40,20 +43,26 @@ class Mapper:
         if self.mappings is not None:
             print(f'Generated csv for {self.filename}:')
             for method, method_mappings in self.mappings.items():
-                with open(self.get_filename(method), 'w') as f:
-                    f.write('source,target\n')
+                with open(self.get_filename(method), 'w') as f:                    
+                    if args.reverse:
+                        f.write(','.join([args.target,args.source]))
+                    else:
+                        f.write(','.join([args.source,args.target]))
+                    
                     for m in method_mappings:
-                        f.write(','.join(m))
                         f.write('\n')
-                    f.write('\n')
+                        f.write(','.join(m))
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
-            print(f'No mappings found')
+            print(f'No mappings found. Did you load and parse an input file first?')
 
 if __name__ == '__main__':
     # argparse
     parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface and generates a csv that can be pasted on a Confluence page.')
     parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
+    parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='source')
+    parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='target')
+    parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     args = parser.parse_args()
 
     m = Mapper()  
