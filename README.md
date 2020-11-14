@@ -25,6 +25,8 @@ Generated csv for ./sample/CarMapper.java:
   carDtoToCar(CarDto_carDto) -> [carDtoToCar(CarDto_carDto).csv]
 ```
 
+## Reverse flag
+
 Use `-r` flag to reverse order of columns in csv output:
 ```python3
 python mapper.py -f ./sample/CarMapper.java -s From -t To -r
@@ -32,16 +34,19 @@ python mapper.py -f ./sample/CarMapper.java -s From -t To -r
 
 ## Generated CSV
 
-carToCarDto(Car_car).csv:
+carToCarDto(Car_car,_Color_color.hex);.csv
 ```
-source,target
+TO,FROM
 numberOfSeats,seatCount
 ```
 
-carDtoToCar(CarDto_carDto).csv:
+carDtoToCar(CarDto_carDto);.csv
 ```
-source,target
+TO,FROM
 seatCount,numberOfSeats
+owner.name,ownerName
+CarBrandEnum.AUDI,carBrand
+new Date(),date
 ```
 
 ## How to paste generated csv on a confluence page
