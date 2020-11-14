@@ -10,7 +10,8 @@ class Mapper:
         self.regex = {
             'method': '[a-zA-Z0-9_]*\([a-zA-Z0-9 ,.]*\);',
             'source': '(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
-            'target': '(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?'
+            'target': '(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
+            'uppercase_letter': '^[a-z]+|[A-Z][a-z0-9]+'
         }
 
     def load(self, filename):
@@ -27,13 +28,23 @@ class Mapper:
                 self.mappings[method] = mappings
                 mappings = []
             elif line.__contains__('@Mapping('):
-                target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
                 source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
+                target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
+                
+                if args.db:
+                    target = self.get_db_column_name(target)
+                
                 if args.reverse:
                     mappings.append((target, source))
                 else:
                     mappings.append((source, target))
         return self
+
+    def get_db_column_name(self, variable):
+        uppercase_letters = re.findall(self.regex['uppercase_letter'], variable)
+        uppercase_letters = [str.upper(x) for x in uppercase_letters]
+        return '_'.join(uppercase_letters)
+
 
     def get_filename(self, method):
         return method + '.csv'
@@ -59,10 +70,11 @@ class Mapper:
 
 if __name__ == '__main__':
     # argparse
-    parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface and generates a csv that can be pasted on a Confluence page.')
+    parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface file and generates CSV that can be pasted on confluence pages')
     parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
     parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='source')
     parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='target')
+    parser.add_argument('-d', '--db', action='store_true', help='format target names as database column names')
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     args = parser.parse_args()
 

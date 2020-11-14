@@ -3,7 +3,7 @@ public interface CarMapper {
 
     CarMapper INSTANCE = Mappers.getMapper( CarMapper.class );
 
-    @Mapping(source = "numberOfSeats", target = "seatCount")
+    @Mapping(source = "numberOfSeats1", target = "seatCount")
     CarDto carToCarDto(Car car, Color color.hex);
 
     @Mapping(source = "seatCount", target = "numberOfSeats")
