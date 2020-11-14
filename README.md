@@ -1,4 +1,4 @@
-# MapStruct Table
+# MapStruct CSV
 
 Parses a Java MapStruct interface file and generates a csv that can be pasted on a Confluence page.
 
