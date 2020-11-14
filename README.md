@@ -9,12 +9,12 @@ Parses a Java MapStruct interface file and generates a csv that can be pasted on
 ## How to run
 
 Run `mapper.py` using python3:
-```python3
+```
 python3 mapper.py -f <path_to_file> -s <source_column_heading> -t <target_column_heading> [-r]
 ```
 
 Example:
-```python3
+```
 python3 mapper.py -f ./sample/CarMapper.java -s From -t To
 ```
 
@@ -28,7 +28,7 @@ Generated csv for ./sample/CarMapper.java:
 ## Reverse flag
 
 Use `-r` flag to reverse order of columns in csv output:
-```python3
+```
 python mapper.py -f ./sample/CarMapper.java -s From -t To -r
 ```
 
