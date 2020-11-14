@@ -7,6 +7,11 @@ class Mapper:
         self.mappings = {}
         self.lines = []
         self.filename = None
+        self.regex = {
+            'method': '[a-zA-Z0-9_]*\([a-zA-Z0-9 ,]*\);',
+            'source': '(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
+            'target': '(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?'
+        }
 
     def load(self, filename):
         with open(filename, 'r') as f:
@@ -17,14 +22,15 @@ class Mapper:
     def parse(self):
         mappings = []
         for line in self.lines:
-            if re.search(r'[a-zA-Z0-9_]*\([a-zA-Z0-9 ]*\);', line):
-                method = re.search(r'[a-zA-Z0-9_]*\([a-zA-Z0-9 ]*\)', line).group(0).replace(' ', '_'
+            if re.search(self.regex['method'], line):
+                method = re.search(self.regex['method'], line).group(0).replace(' ', '_'
                 )
                 self.mappings[method] = mappings
                 mappings = []
             elif line.__contains__('@Mapping('):
-                m = re.findall(r'\"[a-zA-Z0-9]*\"', line)
-                mappings.append((m[0].strip('"'), m[1].strip('"')))
+                source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
+                target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
+                mappings.append((source, target))
         return self
 
     def get_filename(self, method):
@@ -38,6 +44,7 @@ class Mapper:
                     f.write('source,target\n')
                     for m in method_mappings:
                         f.write(','.join(m))
+                        f.write('\n')
                     f.write('\n')
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
