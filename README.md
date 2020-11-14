@@ -15,7 +15,7 @@ python3 mapper.py -f <path_to_file> -s <source_column_heading> -t <target_column
 
 Example:
 ```
-python3 mapper.py -f ./sample/CarMapper.java -s From -t To
+python3 mapper.py -f ./sample/CarMapper.java -s FROM -t TO
 ```
 
 Console output
@@ -25,14 +25,12 @@ Generated csv for ./sample/CarMapper.java:
   carDtoToCar(CarDto_carDto); -> [carDtoToCar(CarDto_carDto);.csv]
 ```
 
-## Reverse flag
+## Flags
 
 Use `-r` flag to reverse the order of columns in csv output:
 ```
 python mapper.py -f ./sample/CarMapper.java -s FROM -t TO -r
 ```
-
-## Database flag
 
 Use `-d` flag to format target names as database column names:
 ```
