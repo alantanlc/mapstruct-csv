@@ -38,16 +38,18 @@ class Mapper:
     def get_filename(self, method):
         return method + '.csv'
 
+    def get_heading_row(self):
+        if args.reverse:
+            return ','.join([args.target, args.source])
+        else:
+            return ','.join([args.source, args.target])
+
     def generate(self):
         if self.mappings is not None:
             print(f'Generated csv for {self.filename}:')
             for method, method_mappings in self.mappings.items():
-                with open(self.get_filename(method), 'w') as f:                    
-                    if args.reverse:
-                        f.write(','.join([args.target,args.source]))
-                    else:
-                        f.write(','.join([args.source,args.target]))
-                    
+                with open(self.get_filename(method), 'w') as f:
+                    f.write(self.get_heading_row())
                     for m in method_mappings:
                         f.write('\n')
                         f.write(','.join(m))
@@ -64,5 +66,5 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     args = parser.parse_args()
 
-    m = Mapper()  
+    m = Mapper()
     m.load(args.filename).parse().generate()
