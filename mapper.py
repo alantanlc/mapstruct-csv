@@ -11,7 +11,7 @@ class Mapper:
             'method': '[a-zA-Z0-9_]*\([a-zA-Z0-9 ,.]*\);',
             'source': '(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
             'target': '(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
-            'uppercase_letter': '^[a-z]+|[A-Z][a-z0-9]+'
+            'camelCaseWord': '^[a-z]+|[A-Z][a-z0-9]+'
         }
 
     def load(self, filename):
@@ -41,9 +41,9 @@ class Mapper:
         return self
 
     def get_db_column_name(self, variable):
-        uppercase_letters = re.findall(self.regex['uppercase_letter'], variable)
-        uppercase_letters = [str.upper(x) for x in uppercase_letters]
-        return '_'.join(uppercase_letters)
+        camelCaseWords = re.findall(self.regex['camelCaseWord'], variable)
+        camelCaseWords = [str.upper(x) for x in camelCaseWords]
+        return '_'.join(camelCaseWords)
 
 
     def get_filename(self, method):
