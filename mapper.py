@@ -9,7 +9,7 @@ class Mapper:
         self.filename = None
         self.regex = {
             'method': r'[a-zA-Z0-9_]*\([a-zA-Z0-9 ,.]*\);',
-            'source': r'(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
+            'source': r'(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9._ ()]*[\"]?',
             'target': r'(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
             'camelCaseWord': r'^[a-z]+|[A-Z][a-z0-9]+'
         }
