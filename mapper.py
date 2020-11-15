@@ -15,12 +15,18 @@ class Mapper:
         }
 
     def load(self, filename):
+        """Store texts from filename in self.lines as a list of lines"""
         with open(filename, 'r') as f:
             self.filename = filename
             self.lines = f.readlines()
         return self
 
     def parse(self):
+        """Parse self.lines to self.mappings.
+        Use self.load(self, filename) to load text from file into self.lines first.
+        If successful, self.mappings will contain a dictionary of 
+        mapping method name mapped to a list of tuples of source and target.
+        """
         mappings = []
         for line in self.lines:
             if re.search(self.regex['method'], line):
@@ -41,21 +47,31 @@ class Mapper:
         return self
 
     def get_db_column_name(self, variable):
+        """Convert camelcase or pascalcase names to database column names.
+        Split camelcase or pascalcase names into words by uppercase letters, 
+        capitalize words and then join words using underscore (_).
+        """
         camelCaseWords = re.findall(self.regex['camelCaseWord'], variable)
         camelCaseWords = [str.upper(x) for x in camelCaseWords]
         return '_'.join(camelCaseWords)
 
 
     def get_filename(self, method):
+        """Return the output mapping method filename with file extension appended."""
         return method + '.csv'
 
     def get_heading_row(self):
+        """Return the heading row csv in normal or reverse order."""
         if args.reverse:
             return ','.join([args.target, args.source])
         else:
             return ','.join([args.source, args.target])
 
     def generate(self):
+        """Generate a CSV for each mapping method from self.mappings.
+        Use self.parse() to parse self.lines into self.mappings first.
+        Name of each CSV is the mapping method definition itself.
+        """
         if self.mappings is not None:
             print(f'Generated csv for {self.filename}:')
             for method, method_mappings in self.mappings.items():
