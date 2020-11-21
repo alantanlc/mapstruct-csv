@@ -3,6 +3,6 @@ source: FROM
 target: TO
 database: True
 reverse: True
-comment: 'COMMENT'
+comment: COMMENT
 inherit: True
 join: True
