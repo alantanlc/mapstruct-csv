@@ -4,16 +4,16 @@ import argparse
 class Mapper:
 
     def __init__(self):
+        self.filename = None
+        self.lines = []
         self.mappings = {}
         self.inherits = {}
-        self.lines = []
-        self.filename = None
         self.regex = {
             'method': r'[a-zA-Z0-9]+\([a-zA-Z0-9 ,.]*\);',
-            'source': r'(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9._ ()]*[\"]?',
-            'target': r'(target)[ ]?=[ ]?[\"][a-zA-Z0-9. ()]*[\"]',
-            'name': r'(name)[ ]?=[ ]?[\"][a-zA-Z0-9]*[\"]',
-            'camelCaseWord': r'^[a-z]+|[A-Z][a-z0-9]+'
+            'source': r'(source|constant|expression)[ ]*=[ ]*[\"]?[a-zA-Z0-9._ ()]*[\"]?',
+            'target': r'(target)[ ]*=[ ]*\"[a-zA-Z0-9]*\"',
+            'name': r'(name)[ ]*=[ ]*\"[a-zA-Z0-9]*\"',
+            'camelCaseWord': r'^[a-z0-9]+|[A-Z][a-z0-9]+',
         }
 
     def load(self, filename):
@@ -44,10 +44,12 @@ class Mapper:
             elif line.__contains__('@Mapping('):
                 source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
                 target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
-                
+                if args.join:
+                    s = line.split('//')
+                    if len(s) > 1:
+                        source += s[1].strip()
                 if args.database:
                     target = self.get_db_column_name(target)
-                
                 if args.reverse:
                     mappings.append((target, source))
                 else:
@@ -80,6 +82,11 @@ class Mapper:
         if args.comment:
             result.append(args.comment)
         return ','.join(result)
+
+    def get_full_method_by_name(self, name):
+        for m in self.mappings.keys():
+            if m.startswith(name + '('):
+                return m
 
     def generate(self):
         """Generate a CSV for each mapping method from self.mappings.
@@ -116,11 +123,6 @@ class Mapper:
         else:
             print(f'No mappings found. Did you load and parse an input file first?')
 
-    def get_full_method_by_name(self, name):
-        for m in self.mappings.keys():
-            if m.startswith(name + '('):
-                return m
-
 if __name__ == '__main__':
     # argparse
     parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface file and generates CSV that can be pasted on confluence pages')
@@ -131,6 +133,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     parser.add_argument('-c', '--comment', nargs='?', const='Comment', help='include a comment column at the end')
     parser.add_argument('-i', '--inherit', action='store_true', help='include @InheritConfiguration mappings')
+    parser.add_argument('-j', '--join', action='store_true', help='join source with additional mapping defined as a comment on the same line')
     args = parser.parse_args()
 
     m = Mapper()
