@@ -7,6 +7,7 @@ public interface CarMapper {
     @Mapping(constant = COMMON.CAR_USER, target = "user")
     CarDto carToCarDto(Car car, Color color.hex);
 
+    @InheritConfiguration(name = "carDtoToCar3")
     @Mapping(source = "seatCount", target = "numberOfSeats")
     @Mapping(source = "owner.name", target = "ownerName")
     @Mapping(constant = CarBrandEnum.AUDI, target = "carBrand")
@@ -18,5 +19,8 @@ public interface CarMapper {
     @Mapping(source = "make", target="make3") // [2].id.name
     @InheritConfiguration(name = "carDtoToCar")
     Car carDtoToCar2(CarDto carDto);
+
+    @Mapping(source = "make", target ="make4") // [3].id.name
+    Car carDtoToCar3(CarDto carDto);
 
 }

@@ -105,7 +105,7 @@ class Mapper:
                         else:
                             f.write(','.join(m))
                     if args.inherit:
-                        queue = self.inherits[method]
+                        queue = self.inherits[method].copy()
                         visited = set()
                         while len(queue) > 0:
                             n = queue.pop(0)
