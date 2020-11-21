@@ -1,0 +1,8 @@
+filename: ./sample/CarMapper.java
+source: FROM
+target: TO
+database: True
+reverse: True
+comment: 'COMMENT'
+inherit: True
+join: True

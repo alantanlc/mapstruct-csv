@@ -1,5 +1,6 @@
 import re
 import argparse
+import yaml
 
 class Mapper:
 
@@ -65,7 +66,6 @@ class Mapper:
         camelCaseWords = [str.upper(x) for x in camelCaseWords]
         return '_'.join(camelCaseWords)
 
-
     def get_filename(self, method):
         """Return the output mapping method filename with file extension appended."""
         return method + '.csv'
@@ -126,6 +126,7 @@ class Mapper:
 if __name__ == '__main__':
     # argparse
     parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface file and generates CSV that can be pasted on confluence pages')
+    parser.add_argument('-y', '--yaml', type=str, help='name of yaml config file', default='./config.yaml')
     parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
     parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='Source')
     parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='Target')
@@ -135,6 +136,13 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--inherit', action='store_true', help='include @InheritConfiguration mappings')
     parser.add_argument('-j', '--join', action='store_true', help='join source with additional mapping defined as a comment on the same line')
     args = parser.parse_args()
+
+    if args.yaml:
+        with open(args.yaml) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            for k, v in data.items():
+                args.__setattr__(k, v)
+            print(data)
 
     m = Mapper()
     m.load(args.filename).parse().generate()
