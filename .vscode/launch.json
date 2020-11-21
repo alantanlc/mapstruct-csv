@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["-f", "./sample/CarMapper.java"],
+            "args": ["-f", "./sample/CarMapper.java", "-c"],
             "console": "integratedTerminal"
         }
     ]

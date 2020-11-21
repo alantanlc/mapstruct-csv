@@ -61,11 +61,20 @@ class Mapper:
         return method + '.csv'
 
     def get_heading_row(self):
-        """Return the heading row csv in normal or reverse order."""
+        """Return the heading row csv."""
+        result = []
+
         if args.reverse:
-            return ','.join([args.target, args.source])
+            result.append(args.target)
+            result.append(args.source)
         else:
-            return ','.join([args.source, args.target])
+            result.append(args.source)
+            result.append(args.target)
+
+        if args.comment:
+            result.append(args.comment)
+
+        return ','.join(result)
 
     def generate(self):
         """Generate a CSV for each mapping method from self.mappings.
@@ -79,7 +88,10 @@ class Mapper:
                     f.write(self.get_heading_row())
                     for m in method_mappings:
                         f.write('\n')
-                        f.write(','.join(m))
+                        if args.comment:
+                            f.write(','.join(m) + ',')
+                        else:
+                            f.write(','.join(m))
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
             print(f'No mappings found. Did you load and parse an input file first?')
@@ -88,10 +100,11 @@ if __name__ == '__main__':
     # argparse
     parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface file and generates CSV that can be pasted on confluence pages')
     parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
-    parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='source')
-    parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='target')
+    parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='Source')
+    parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='Target')
     parser.add_argument('-d', '--db', action='store_true', help='format target names as database column names')
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
+    parser.add_argument('-c', '--comment', nargs='?', const='Comment', help='include a comment column at the end')
     args = parser.parse_args()
 
     m = Mapper()
