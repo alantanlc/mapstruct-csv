@@ -5,12 +5,14 @@ class Mapper:
 
     def __init__(self):
         self.mappings = {}
+        self.inherits = {}
         self.lines = []
         self.filename = None
         self.regex = {
-            'method': r'[a-zA-Z0-9_]*\([a-zA-Z0-9 ,.]*\);',
+            'method': r'[a-zA-Z0-9]+\([a-zA-Z0-9 ,.]*\);',
             'source': r'(source|constant|expression)[ ]?=[ ]?[\"]?[a-zA-Z0-9._ ()]*[\"]?',
-            'target': r'(target)[ ]?=[ ]?[\"]?[a-zA-Z0-9. ()]*[\"]?',
+            'target': r'(target)[ ]?=[ ]?[\"][a-zA-Z0-9. ()]*[\"]',
+            'name': r'(name)[ ]?=[ ]?[\"][a-zA-Z0-9]*[\"]',
             'camelCaseWord': r'^[a-z]+|[A-Z][a-z0-9]+'
         }
 
@@ -28,16 +30,22 @@ class Mapper:
         mapping method name mapped to a list of tuples of source and target.
         """
         mappings = []
+        inherits = []
         for line in self.lines:
             if re.search(self.regex['method'], line):
                 method = re.search(self.regex['method'], line).group(0).replace(' ', '_')
                 self.mappings[method] = mappings
+                self.inherits[method] = inherits
                 mappings = []
+                inherits = []
+            elif line.__contains__('@InheritConfiguration('):
+                name = re.search(self.regex['name'], line).group(0).split('=')[1].strip().strip('"')
+                inherits.append(name)
             elif line.__contains__('@Mapping('):
                 source = re.search(self.regex['source'], line).group(0).split('=')[1].strip().strip('"')
                 target = re.search(self.regex['target'], line).group(0).split('=')[1].strip().strip('"')
                 
-                if args.db:
+                if args.database:
                     target = self.get_db_column_name(target)
                 
                 if args.reverse:
@@ -92,9 +100,29 @@ class Mapper:
                             f.write(','.join(m) + ',')
                         else:
                             f.write(','.join(m))
+                    if args.inherit:
+                        queue = self.inherits[method]
+                        visited = set()
+                        while len(queue) > 0:
+                            n = queue.pop(0)
+                            if n not in visited:
+                                for i in self.mappings[self.get_full_method_by_name(n)]:
+                                    f.write('\n')
+                                    if args.comment:
+                                        f.write(','.join(i) + ',')
+                                    else:
+                                        f.write(','.join(i))
+                                visited.add(n)
+                                for e in self.inherits[self.get_full_method_by_name(n)]:
+                                    queue.append(e)
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
             print(f'No mappings found. Did you load and parse an input file first?')
+
+    def get_full_method_by_name(self, name):
+        for m in self.mappings.keys():
+            if m.startswith(name + '('):
+                return m
 
 if __name__ == '__main__':
     # argparse
@@ -102,9 +130,10 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
     parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='Source')
     parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='Target')
-    parser.add_argument('-d', '--db', action='store_true', help='format target names as database column names')
+    parser.add_argument('-d', '--database', action='store_true', help='format target names as database column names')
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     parser.add_argument('-c', '--comment', nargs='?', const='Comment', help='include a comment column at the end')
+    parser.add_argument('-i', '--inherit', action='store_true', help='include @InheritConfiguration mappings')
     args = parser.parse_args()
 
     m = Mapper()

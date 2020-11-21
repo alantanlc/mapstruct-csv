@@ -13,4 +13,8 @@ public interface CarMapper {
     @Mapping(expression = "new Date()", target = "date")
     Car carDtoToCar(CarDto carDto);
 
+    @Mapping(source = "make", target="make")
+    @InheritConfiguration(name = "carDtoToCar")
+    Car carDtoToCar2(CarDto carDto);
+
 }
