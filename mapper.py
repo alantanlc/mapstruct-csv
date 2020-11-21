@@ -142,7 +142,6 @@ if __name__ == '__main__':
             data = yaml.load(f, Loader=yaml.FullLoader)
             for k, v in data.items():
                 args.__setattr__(k, v)
-            print(data)
 
     m = Mapper()
     m.load(args.filename).parse().generate()
