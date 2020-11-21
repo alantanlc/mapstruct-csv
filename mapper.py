@@ -71,17 +71,14 @@ class Mapper:
     def get_heading_row(self):
         """Return the heading row csv."""
         result = []
-
         if args.reverse:
             result.append(args.target)
             result.append(args.source)
         else:
             result.append(args.source)
             result.append(args.target)
-
         if args.comment:
             result.append(args.comment)
-
         return ','.join(result)
 
     def generate(self):
@@ -105,15 +102,15 @@ class Mapper:
                         visited = set()
                         while len(queue) > 0:
                             n = queue.pop(0)
-                            if n not in visited:
-                                for i in self.mappings[self.get_full_method_by_name(n)]:
-                                    f.write('\n')
-                                    if args.comment:
-                                        f.write(','.join(i) + ',')
-                                    else:
-                                        f.write(','.join(i))
-                                visited.add(n)
-                                for e in self.inherits[self.get_full_method_by_name(n)]:
+                            for i in self.mappings[self.get_full_method_by_name(n)]:
+                                f.write('\n')
+                                if args.comment:
+                                    f.write(','.join(i) + ',')
+                                else:
+                                    f.write(','.join(i))
+                            visited.add(n)
+                            for e in self.inherits[self.get_full_method_by_name(n)]:
+                                if e not in visited:
                                     queue.append(e)
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
