@@ -1,6 +1,7 @@
 import re
 import argparse
 import yaml
+import os
 
 class Mapper:
 
@@ -68,7 +69,9 @@ class Mapper:
 
     def get_filename(self, method):
         """Return the output mapping method filename with file extension appended."""
-        return method + '.csv'
+        if not os.path.exists(args.output):
+            os.makedirs(args.output)
+        return args.output + '/' + method + '.csv'
 
     def get_heading_row(self):
         """Return the heading row csv."""
@@ -88,6 +91,13 @@ class Mapper:
             if m.startswith(name + '('):
                 return m
 
+    def write_mapping_to_file(self, mapping, f):
+        f.write('\n')
+        if args.comment:
+            f.write(','.join(mapping) + ',')
+        else:
+            f.write(','.join(mapping))
+
     def generate(self):
         """Generate a CSV for each mapping method from self.mappings.
         Use self.parse() to parse self.lines into self.mappings first.
@@ -98,27 +108,20 @@ class Mapper:
             for method, method_mappings in self.mappings.items():
                 with open(self.get_filename(method), 'w') as f:
                     f.write(self.get_heading_row())
-                    for m in method_mappings:
-                        f.write('\n')
-                        if args.comment:
-                            f.write(','.join(m) + ',')
-                        else:
-                            f.write(','.join(m))
+                    for mapping in method_mappings:
+                        self.write_mapping_to_file(mapping, f)
                     if args.inherit:
                         queue = self.inherits[method].copy()
                         visited = set()
                         while len(queue) > 0:
                             n = queue.pop(0)
-                            for i in self.mappings[self.get_full_method_by_name(n)]:
-                                f.write('\n')
-                                if args.comment:
-                                    f.write(','.join(i) + ',')
-                                else:
-                                    f.write(','.join(i))
                             visited.add(n)
-                            for e in self.inherits[self.get_full_method_by_name(n)]:
-                                if e not in visited:
-                                    queue.append(e)
+                            n_method = self.get_full_method_by_name(n)
+                            for mapping in self.mappings[n_method]:
+                                self.write_mapping_to_file(mapping, f)
+                            for inherit in self.inherits[n_method]:
+                                if inherit not in visited:
+                                    queue.append(inherit)
                 print(f'  {method} -> [{self.get_filename(method)}]')
         else:
             print(f'No mappings found. Did you load and parse an input file first?')
@@ -126,15 +129,16 @@ class Mapper:
 if __name__ == '__main__':
     # argparse
     parser = argparse.ArgumentParser(description='Parses a Java MapStruct interface file and generates CSV that can be pasted on confluence pages')
-    parser.add_argument('-y', '--yaml', type=str, help='name of yaml config file', default='./config.yaml')
-    parser.add_argument('-f', '--filename', type=str, help='name of mapper interface file', default='./sample/CarMapper.java')
-    parser.add_argument('-s', '--source', type=str, help='heading text of source column', default='Source')
-    parser.add_argument('-t', '--target', type=str, help='heading text of target column', default='Target')
+    parser.add_argument('-y', '--yaml', type=str, default='./config.yaml', help='name of yaml config file')
+    parser.add_argument('-f', '--filename', type=str, default='./sample/CarMapper.java', help='name of mapper interface file')
+    parser.add_argument('-s', '--source', type=str, default='Source', help='heading text of source column')
+    parser.add_argument('-t', '--target', type=str, default='Target', help='heading text of target column')
     parser.add_argument('-d', '--database', action='store_true', help='format target names as database column names')
     parser.add_argument('-r', '--reverse', action='store_true', help='reverse the column output order')
     parser.add_argument('-c', '--comment', nargs='?', const='Comment', help='include a comment column at the end')
     parser.add_argument('-i', '--inherit', action='store_true', help='include @InheritConfiguration mappings')
     parser.add_argument('-j', '--join', action='store_true', help='join source with additional mapping defined as a comment on the same line')
+    parser.add_argument('-o', '--output', type=str, default='output', help='name of output directory')
     args = parser.parse_args()
 
     if args.yaml:
