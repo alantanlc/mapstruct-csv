@@ -55,3 +55,4 @@ class MapperInterface:
 if __name__ == '__main__':
     m = MapperInterface()
     m.load('./sample/message.xlsx', 'Mapping').parse()
+    print('hello')
