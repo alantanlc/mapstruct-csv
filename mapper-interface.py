@@ -21,7 +21,7 @@ class MapperInterface:
         """Store texts from filename in self.lines as a list of lines"""
         with pd.ExcelFile(filename) as xlsx:
             df = pd.read_excel(xlsx, sheet)
-            self.lines = [(x[0], x[1]) for x in df.values]
+            self.lines = [(x[1], x[2], x[3]) for x in df.values[5:]]
         return self
 
     def parse(self):
@@ -31,11 +31,11 @@ class MapperInterface:
         message and its corresponding mapping in the form of 
         a tree data structure.
         """
-        self.root = Node(self.lines[0][0], self.lines[0][1])
+        self.root = Node(self.lines[0][0], self.lines[0][2])
         for line in self.lines[1:]:
             depth = self.get_depth_from_value(line[0])
             node = self.get_last_node_at_depth(self.root, depth - 1)
-            node.add(Node('.'.join([node.input, line[0].strip()]), line[1]))
+            node.add(Node('.'.join([node.input, line[0].strip()]), line[2]))
 
     def get_depth_from_value(self, value):
         """Return the node depth based on number of spaces in the beginning of value.
