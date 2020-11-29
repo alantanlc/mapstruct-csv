@@ -9,8 +9,9 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["-f", "./sample/CarMapper.java", "-s", "From", "-t", "To", "-d", "-r", "-c", "-i", "-j"],
+            // "args": ["-f", "./sample/CarMapper.java", "-s", "From", "-t", "To", "-d", "-r", "-c", "-i", "-j"],
             // "args": ["-y", "./config.yaml"],
+            // "args": ["-f", "./sample/message.xlsx", "-s", "Mapping"],
             "console": "integratedTerminal"
         }
     ]
