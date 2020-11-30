@@ -5,6 +5,8 @@ Parses a Java MapStruct interface file and generates CSV that can be pasted on c
 ## Dependencies
 
 - python3+
+- virtualenv
+- pip3
 - yaml
 
 ## Virtualenv and pip
@@ -14,14 +16,12 @@ Create a virtualenv directory:
 virtualenv env
 ```
 
-Activate:
-
-__macOS/Linux__:
+Activate environment (macOS/Linux):
 ```
-source env/bin/active
+source env/bin/activate
 ```
 
-__Windows__:
+Activate environment (Windows):
 ```
 .\env\bin\activate.bat
 ```
@@ -104,7 +104,8 @@ MAKE4,make[3].id.name,
 1. Open generated csv using Microsoft Excel
 1. Copy rows and columns
 1. Open confluence page in edit mode and paste
-1. Unsplit cells if necessary, add heading rows and numbering columns if necessary
+1. Unsplit cells if necessary
+1. Add heading rows and numbering columns if necessary
 1. Save page and review output
 
 ## How to paste generated csv on a confluence page as an Advanced CSV Table
